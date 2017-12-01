@@ -1,4 +1,4 @@
 # jct-elog-calc
-John Christer Trucking / eLog Calculator
+John Christner Trucking / eLog Calculator
 
 http://freeformagency.com/dev/jct/e-log/
