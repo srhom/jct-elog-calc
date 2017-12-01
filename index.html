@@ -1,0 +1,635 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+		<meta charset="utf-8">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<title></title>
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+		<!-- Place favicon.ico in the root directory -->
+		
+		<link rel="stylesheet" href="css/normalize.css">
+		<script src="https://use.fontawesome.com/d182395329.js"></script>
+		
+		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+		<link href="https://bootswatch.com/cosmo/bootstrap.min.css" rel="stylesheet">
+		
+		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="css/jct-style.css">
+		<link href="css/app.css" rel="stylesheet">
+		
+		<script src="js/vendor/modernizr-2.8.3.min.js"></script>
+		<link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
+		
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+		<script src="js/vendor/FlipClock/compiled/flipclock.js"></script>
+		<link rel="stylesheet" href="js/vendor/FlipClock/compiled/flipclock.css">
+		
+		<script type="text/javascript" src="js/vendor/jquery.timepicker/jquery.timepicker.js"></script>
+<!-- 		<link rel="stylesheet" type="text/css" href="js/vendor/jquery.timepicker/jquery.timepicker.css" /> -->
+		
+		<script type="text/javascript" src="js/vendor/jquery.timepicker/lib/bootstrap-datepicker.js"></script>
+		<link rel="stylesheet" type="text/css" href="js/vendor/jquery.timepicker/lib/bootstrap-datepicker.css" />
+		
+		<script type="text/javascript" src="js/vendor/jquery.timepicker/lib/site.js"></script>
+<!-- 		<link rel="stylesheet" type="text/css" href="js/vendor/jquery.timepicker/lib/site.css" /> -->
+		
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		
+		<link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+		
+<script type="text/javascript">
+
+    /** This section is only needed once per page if manually copying **/
+    if (typeof MauticSDKLoaded == 'undefined') {
+        var MauticSDKLoaded = true;
+        var head            = document.getElementsByTagName('head')[0];
+        var script          = document.createElement('script');
+        script.type         = 'text/javascript';
+        script.src          = 'http://marketing.freeformagency.com/johnchristner/media/js/mautic-form.js';
+        script.onload       = function() {
+            MauticSDK.onLoad();
+        };
+        head.appendChild(script);
+        var MauticDomain = 'http://marketing.freeformagency.com';
+        var MauticLang   = {
+            'submittingMessage': "Please wait..."
+        }
+    }
+</script>
+
+        
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyDF-1NBBC2Wfv5H_8fytgUjVpXinTdLeds"></script>
+
+    <script type="text/javascript">
+	    
+	    /**************************
+		General Functions
+		**************************/	    
+	    (function($) {
+		    $(document).ready(function() {
+		    $("#datepicker").datepicker({
+			        showOtherMonths: true,
+			        selectOtherMonths: true,
+			        dateFormat: "mm/dd/yy",
+			        //onSelect: function(selectedDate) {
+			            //window.date = $(this).datepicker("getDate");
+			            //window.date.setDate(window.date.getDate() + 3);
+			            //window.date = $('#datepicker').datepicker({ dateFormat: 'dd-mm-yy' }).val()
+			            //$("#dvEndDay").datepicker("setDate", window.date);
+			            //$("#dvEndDay").datepicker( "option", "minDate", selectedDate );
+			        //}
+			    });
+/*
+			$("#dvEndDay").datepicker({
+			        showOtherMonths: true,
+			        selectOtherMonths: true,
+			        dateFormat: "mm/dd/y",
+			        onSelect: function(selectedDate) {
+			            //$("#datepicker").datepicker( "option", "maxDate", selectedDate );
+			        }
+			    });
+*/		    
+		    $("#singlebutton").click( function(e) {
+				e.preventDefault();
+				}
+		    );
+		    
+			$('.btnNext').click(function(){
+			  $('.nav-tabs > .active').next('li').find('a').trigger('click');
+			});
+			
+			$('.btnPrevious').click(function(){
+			  $('.nav-tabs > .active').prev('li').find('a').trigger('click');
+			});
+		    
+			});
+		    	    
+	    })(jQuery);
+	    
+	    
+	    /**************************
+		Google Maps API
+		**************************/
+		var source, destination;
+        var directionsDisplay;
+        var distance;
+        var duration;
+        var directionsService = new google.maps.DirectionsService();        
+        google.maps.event.addDomListener(window, 'load', function () {
+            new google.maps.places.SearchBox(document.getElementById('txtSource'));
+            new google.maps.places.SearchBox(document.getElementById('txtDestination'));
+            directionsDisplay = new google.maps.DirectionsRenderer({ 'draggable': true });
+        });
+
+        function GetRoute() {
+            var tulsa = new google.maps.LatLng(36.1314, 95.9372);
+            var setDate = $("#datepicker").val();
+            var mapOptions = {
+                zoom: 7,
+                center: tulsa
+            };
+            //map = new google.maps.Map(document.getElementById('dvMap'), mapOptions);
+            //directionsDisplay.setMap(map);
+            //directionsDisplay.setPanel(document.getElementById('dvPanel'));
+
+            //*********DIRECTIONS AND ROUTE**********************//
+            source = document.getElementById("txtSource").value;
+            destination = document.getElementById("txtDestination").value;
+
+            var request = {
+                origin: source,
+                destination: destination,
+                travelMode: google.maps.TravelMode.DRIVING
+            };
+            directionsService.route(request, function (response, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                    directionsDisplay.setDirections(response);
+                }
+            });
+
+            //*********DISTANCE AND DURATION**********************//	      	
+            var service = new google.maps.DistanceMatrixService();
+            service.getDistanceMatrix({
+                origins: [source],
+                destinations: [destination],
+                travelMode: google.maps.TravelMode.DRIVING,
+                unitSystem: google.maps.UnitSystem.IMPERIAL,
+                avoidHighways: false,
+                avoidTolls: false
+            }, function (response, status) {
+                if (status == google.maps.DistanceMatrixStatus.OK && response.rows[0].elements[0].status != "ZERO_RESULTS") {
+                    var distance = response.rows[0].elements[0].distance.text;
+                    var durationTime = (response.rows[0].elements[0].duration.value/60).toFixed(0);
+                    var duration = response.rows[0].elements[0].duration.text;
+                    //var dvDistance = document.getElementById("dvDistance");
+                    //dvDistance.innerHTML = "";
+                    //dvDistance.innerHTML += "Distance: " + distance + "<br />";
+                    //dvDistance.innerHTML += "Duration:" + duration;
+                    
+                    rawDistance = (distance).replace(' mi','');
+                    rawDistance = (rawDistance).replace(",", "");
+                    rawDistance = parseInt(rawDistance, 10);
+                    
+                    //taken raw data - speed limit 53 mph
+                    driveTime = rawDistance / 53;
+                    driveTime = (driveTime).toFixed(2);
+                    driveTime = parseInt(driveTime, 10);
+                    //Number of 11 hour shifts
+                    driveShifts = driveTime / 11;
+                    driveShifts = (driveShifts).toFixed(2);
+                    driveShifts = parseInt(driveShifts, 10);
+                    //Number of fuel ups - once every 1000 miles
+                    driveFuels = rawDistance / 1000;
+                    driveFuels = (driveFuels).toFixed(2);
+                    driveFuels = parseInt(driveFuels, 10);
+                    // Number of 30 min breaks
+                    driveBreaks = driveTime / 8;
+                    driveBreaks = (driveBreaks).toFixed(2);
+                    driveBreaks = parseInt(driveBreaks, 10);
+                    //Load and Unload time
+                    driveLoad = 4;
+                    
+                    //Days on road
+                    driveTotal = driveTime + driveLoad + (driveShifts * 10) + (driveFuels * 1) + (driveBreaks * .5);
+                    //driveDays = (driveTime / 10.5).toFixed(1);
+                    driveDays = (driveTotal / 24).toFixed(1);
+					
+					//OLD - taken from Google - posted speed limits
+					durationTime = durationTime / 60;
+					durationTime = (durationTime / 11).toFixed(2);
+					
+					source = (source).replace(', United States','');
+					destination = (destination).replace(', United States','');
+					
+					// add Calendar days
+					addDays = Math.round(driveDays)
+					
+					date = $('#datepicker').datepicker("getDate");
+					date.setDate(date.getDate() + addDays);
+					dateNew = $.datepicker.formatDate("mm/dd/yy", date);
+					//console.log($.datepicker.formatDate("mm/dd/yy", date));
+                    
+                    $("#result > .result > #dvOrigin").html("<h2>" + source + "</h2>");
+                    $("#result > .result > #dvDestination").html("<h2>" + destination + "</h2>");
+                    $("#result > .result > #dvMiles").html("<h2>" + distance + "</h2>");
+                    $("#result > .result > #dvTime").html("<h2>" + driveTime + " hours</h2>");
+                    $("#result > .result > #dvDays").html("<h2>" + driveDays + " days</h2>");
+                    //$("#dvDetails").html("<h3>The total driving time of <span style='font-weight: 600;'>" + driveTime + " hours</span> has been split over <span style='font-weight: 600;'>11-hour driving shifts, with a 10-hour breaks between</span>. We have also allowed 2 hours load/unload time, 1 hour for refueling and a 30 minute break per the eLog requirements.</h3>");
+                    $("#result > .result > #dvStart").html("<h2>" + setDate + "</h2>");
+                    $("#result > .result > #dvEnd").html("<h2>" + dateNew + "</h2>");
+                    
+                    //narrative copy
+                    $("#narrative > #dvOrigin").html("<strong>" + source + "</strong>");
+                    $("#narrative > #dvDestination").html("<strong>" + destination + "</strong>");
+                    $("#narrative > #dvMiles").html("<strong>" + rawDistance + "</strong>");
+                    $("#narrative > #dvTime").html("<strong>" + driveTime + "</strong>");
+                    $("#narrative > #dvDays").html("<strong>" + driveDays + "</strong>");
+                    $("#narrative > #dvStart").html("<strong>" + setDate + "</strong>");
+                    $("#narrative > #dvEnd").html("<strong>" + dateNew + "</strong>");
+                    
+                    console.log("Drive Time: " + driveTime + " hours");
+                    console.log("Drive Time Off: " + (driveShifts * 10) + " hours");
+                    console.log("Drive Fuels: " + driveFuels);
+                    console.log("Drive Breaks: " + (driveBreaks * .5) + " hours");
+                    console.log("Drive Loads: " + driveLoad + " hours");
+                    console.log("Total Drive: " + driveTotal + " hours");
+                    console.log("Total Miles: " + rawDistance + " miles");
+                    
+
+                } else {
+                    alert("Unable to find the distance via road.");
+                }
+            });
+        }
+		
+		/************************
+		End Google Maps API
+		************************/ 
+		
+		function checkModal() {
+			if ($("#txtSource").val() != "" && $("#txtDestination").val() != "" && $("#datepicker").val() != "") {
+					  $('#myModal').modal('show');
+					  postModal()
+					} else {
+						alert("Please enter an Origin, Destination and Start Date.")
+					}
+			
+		}
+						
+		function postModal() {
+		    $('#myModal').on('shown.bs.modal', function() {
+			    GetRoute();
+				//addDate(durationTime);
+				//console.log(date + " " + selectedDate);
+			})
+	    }
+		
+    </script>
+        
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+        <header>
+	        <div class="header-inner">
+<!-- 	        <div id="header-content"><img class="logo" src="img/logo.png"></div> -->
+	        <div id="header-img-002"><img class="logo" src="img/logo.png"></div>
+	        </div>    
+	    </header>
+<!-- 	    <div id="header-img-002"></div> -->
+	    <div id="clock-wrapper">
+	    <h2 style="margin-bottom: 1em;">What you need to know about the coming eLog deadline that takes effect on December 18, 2017.</h2>
+			    <div id="flipClock"></div>
+			    <h3>Until the eLog Compliance Deadline</h3>
+	    </div>
+        <section class="calc">
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 col-sm-12">
+      <div class="tabs-left">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#a" data-toggle="tab">Introduction | 1.1 <span class="glyphicon glyphicon-plus-sign"></span></a></li>
+          <li><a href="#b" data-toggle="tab">eLog Issues | 1.2 <span class="glyphicon glyphicon-plus-sign"></span></a></li>
+          <li><a href="#c" data-toggle="tab">Calculator | 1.3 <span class="glyphicon glyphicon-plus-sign"></span></a></li>
+          <li><a href="#d" data-toggle="tab">Round Table | 1.4 <span class="glyphicon glyphicon-plus-sign"></span></a></li>
+          <li><a href="#f" data-toggle="tab">New Articles | 1.5 <span class="glyphicon glyphicon-plus-sign"></span></a></li>
+          <li><a href="#e" data-toggle="tab">Get Help | 1.6 <span class="glyphicon glyphicon-plus-sign"></span></a></li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="a">
+            <h3>Welcome to the eLog Implementation Guide and Calculator!</h3>
+<div class="video-container"><iframe width="853" height="480" src="https://www.youtube.com/embed/M4Idin-eAlc" frameborder="0" allowfullscreen></iframe></div>
+<br /><br />
+            <p>Welcome to the eLog Implementation Guide and Calculator! The goal of this site is to provide you with the resources you need to effectively prepare for the December 18th eLog mandate deadline. Whether you are a driver or a trucking firm operator, the following modules will help equip you with the industry knowledge you need to progress in your transition to eLogs.</p> 
+            
+            <p>It’s been almost two years since the Federal Motor Carrier Safety Administration (FMCSA) initiated the federal eLog mandate—a regulation requiring most commercial drivers to log hours of service via electronic logging devices (ELDs). Now, with the December deadline looming around the corner, it’s time for the final push toward eLog compliance.</p>
+
+<p>For many carriers and drivers, the road ahead is still paved with uncertainty. <i>How will eLog implementation affect my route logistics? What productivity losses should I expect? Where do I even begin with this transition?</i> </p>
+
+<p>In an effort to help answer these questions and clear the air surrounding the eLog mandate, John Christner Trucking has developed the following <strong>eLog Implementation Guide and Calculator</strong>. This resource provides useful information and tools to help you prepare for the December eLog compliance deadline, including:</p>
+
+<ul>
+<li><strong>Video modules</strong> featuring shared knowledge from industry experts</li>
+<li><strong>Background information</strong> on prominent issues surrounding the eLog mandate</li>
+<li><strong>Calculator</strong> to instantly see the total miles, driving time, and driving days that will be required to meet hours of service regulations</li>
+<!-- <li><strong>Case study</strong> outlining John Christner Trucking’s path to becoming a successful eLog-compliant carrier</li> -->
+</ul> 
+
+<p class="last">The video above features a welcome message from John Christner Trucking COO Danny Christner. Click play to get started and learn more about the resources you’ll find on this site.</p>
+			
+<!-- 			<a class="blue-btn right-side-btn btnNext">Next <i class="fa fa-arrow-right" aria-hidden="true"></i></a> -->
+          </div>
+          <div class="tab-pane" id="b">
+<!--              <h3>eLog Issues</h3> --> 
+            <p>December 18th—it’s a date everyone in the trucking industry is familiar with. By now, the reality has set in and trucking firms are in the process of adjusting operations to meet ELD compliance. However, the transition is one that has many drivers and trucking firms concerned, due to potential impacts on mileage production and overall operations.</p>
+
+<p>The ELD federal mandate was proposed by the U.S. Department of Transportation’s Federal Motor Carrier Safety Administration (FMCSA) in 2014. According to the FMCSA, the mandate was designed with the intention of increasing both road safety and reporting accuracy by requiring drivers to report hours of service via ELDs. As a result, the mandate holds drivers accountable to meet hours of service regulations, which include maximum driving hour limits and rest breaks.</p>
+
+<p class="last">The eLog method is also designed to make it more difficult to manually manipulate recorded hours of service, which means it will be easier to cite violations when driving regulations are not met. As a result, a route that used to take three days for one driver to complete (by driving for extended hours and adjusting paper log recordings) would take four days for a driver to complete when stopping for all required rest breaks. 
+</p>
+			<h4>Manual Log / Typical Distance</h4>
+			<img style="width: 90%;" src="img/route_001_rev.jpg">
+			<h4>eLog Log / Adjusted Distance</h4>
+			<img class="last" style="width: 90%;" src="img/route_002_rev.jpg">
+	
+	
+	<p>While the ELD mandate applies to most carriers and drivers who are required to track and abide by hours of service, it does not apply to drivers who use paper logs eight days or fewer during a 30-day period, driveaway-towaway drivers, or drivers who operate vehicles manufactured prior to the year 2000.</p>
+
+<p>The ELD mandate also holds provisions for the following:</p>
+<ul>
+<li>Device compliance (device must be able to sync with the vehicle engine and transfer data to inspectors, must be able to automatically record hours of service)</li>
+<li>Supporting documentation requirements (drivers must submit a maximum of eight supporting documents for each 24-hour on-duty period to their carrier no later than 13 days after receiving them)</li>
+<li>Driver harassment (carriers cannot use ELD data to pressure a driver to drive when fatigued or follow actions that would result in an hours of service violation)</li>
+</ul>
+<p class="last">While these are the core issues you need to be aware of for the ELD mandate, additional details and resources can be found on the FMCSA website. Click on the next module (Section 1.3) to calculate the impact the ELD mandate will have on mileage production and route planning.</p>
+		
+          </div>
+          <div class="tab-pane" id="c">
+<!-- 	          <h3>Calculator</h3> --> 
+			<div class="video-container"><iframe width="853" height="480" src="https://www.youtube.com/embed/QMrxLEUtFYw" frameborder="0" allowfullscreen></iframe></div>
+			<br /><br />
+	          <p class="last">Under the federal ELD mandate, having the ability to accurately determine hours of service is now more important than ever to ensure optimal mileage production. The following calculator will help you achieve this important step in your route planning process by providing you with critical information on route logistics. Simply enter an origin and destination for a route to instantly see the total miles, driving time, and driving days that will be required to meet hours of service regulations.</p>
+	          
+	          <h4>Calculate Your Typical Route</h4>
+	          
+	          <form class="form-horizontal">
+				<fieldset>
+				<!-- Text input-->
+				<div class="form-group">
+				  <label class="col-md-4 control-label" for="textinput">Origin</label>  
+				  <div class="col-md-4">
+<!-- 				  <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md"> -->
+
+<!--     <span>Origin:</span> -->
+    <input type="text" id="txtSource" style="width: 250px" class="form-control input-md" placeholder="Enter a location" value="Tulsa, OK, United States"/>
+				    
+				  </div>
+				</div>
+				
+				<!-- Text input-->
+				<div class="form-group">
+				  <label class="col-md-4 control-label" for="textinput">Destination</label>  
+				  <div class="col-md-4">
+<!-- 				  <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md"> -->
+<!-- <span>Destination:</span> -->
+    <input type="text" id="txtDestination" style="width: 250px" class="form-control input-md" placeholder="Enter a location" value="Los Angeles, CA, United States"/>
+				    
+				  </div>
+				</div>
+				
+				<!-- Text input-->
+				
+<div class="form-group">
+				  <label class="col-md-4 control-label" for="textinput">Start Date</label>  
+				  <div class="col-md-4">
+				  <input id="datepicker" type="text" style="width: 250px" class="time form-control input-md" />
+				  <!-- <input id="dvEndDay" type="text" style="width: 250px" class="time form-control input-md" /> -->
+				  
+            </div>
+				</div>
+				
+				<!-- Button -->
+				<div class="form-group">
+				  <label class="col-md-4 control-label" for="singlebutton"></label>
+				  <div class="col-md-4">
+				    <button style="background: #143783;" id="singlebutton" onclick="checkModal()" name="singlebutton" class="btn btn-primary">Submit</button>
+				  </div>
+				</div>
+				
+				</fieldset>
+				</form>
+
+<div class="modal fade bs-example-modal-lg" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+	    
+	    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Route Details</h4>
+      </div>
+	  <div class="modal-body">
+		  <h3>Calculator based on the following criteria:</h3> <p> Average speed of 53 mph / Maximum 14 hour total work day / Maximum 11 hours drive time per day / Average 2 hour load and delivery time / Fuel every 1,000 miles and 1 hour of time / 30 minute break for every 8 hours of drive time / 10 hour break after 11 hours of drive time</p>
+		  
+		  <p id="narrative"><strong>YOUR ROUTE ANALYSIS – </strong> <span id="dvOrigin"></span> <strong>to</strong> <span id="dvDestination"></span>:<br />
+This route is <span id="dvMiles"></span> miles, requires <span id="dvTime"></span> driving hours, requires <span id="dvDays"></span> days.</p>
+
+<p id="narrative">The calculator takes favorable industry averages and applies them to your route. It assumes that it will only take 2 hours to load, 2 hours
+to unload, 1 hour fuel stops with your required 30 minute breaks taken at the same time and that you will travel at an average speed of 53 mph. This calculation also assumes that you will drive your full 11 hours each shift, meaning the 14 hour regulation didn’t limit your drive time.</p>
+
+<p id="narrative"><strong>This is a BEST CASE SCENARIO!</strong></p>
+<p>Studies have shown that trucks spend an average of 2-4 hours to load/unload. The calculation also leaves out any delays at the shipper,
+any inclement weather, slow traffic or mechanical issues and also assumes you will only have 1 pickup. But most importantly, these studies show that on average, operators only drive around 8 hours a day, not 11, due to the 14 hour regulation. Also, non driving work that can be flagged as 15 minutes on paper logs, often takes substantially longer when your eLog device counts every second. Operators often see MORE of a negative impact than what is shown in the calculator.</p>
+		  <p style="font-weight: 600; margin-bottom: 0;font-size: 13px; font-style: italic;">Other Important Details:</p>
+		  <p style="font-size: 13px; font-style: italic;">Individual results may vary if additional times is taken for loading or unloading, breaks, fueling, rest, etc. No provision in this calculation for any pre or post drive inspections.</p>
+		  <div id="dvDistance">
+	  <div id="result">
+		  
+				<div class="result">
+					<p>Origin:</p><div id="dvOrigin">
+					</div>
+				</div>
+				<div class="result">
+					<p>Destination:</p>
+					<div id="dvDestination"></div>
+				</div>
+				<div class="result">
+					<p>Total Miles:</p>
+					<div id="dvMiles"></div>
+				</div>
+				<div class="result">
+					<p>Total Driving Time:</p>
+					<div id="dvTime"></div>
+				</div>
+				<div class="result">
+					<p>Total Load/Unload Time:</p>
+					<div><h2>4 hours</h2></div>
+				</div>
+				<div class="result">
+					<p>Total Time Spent on Load:</p>
+					<div id="dvDays"></div>
+				</div>
+				<div class="result">
+					<p>Start Date:</p>
+					<div id="dvStart"></div>
+				</div>
+				<div class="result">
+					<p>End Date:</p>
+					<div id="dvEnd"></div>
+				</div>
+
+<!--
+				<div class="result">
+					<p style="font-weight: 600;">Other Important Details:</p>
+					<div id="dvDetails"><p>Individual results may vary if additional times is taken for breaks, fueling, rest, etc. No provision in this calculation for any pre or post drive inspections.</p></div>
+				</div>
+-->
+
+			</div>
+	  </div>
+	  <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Enter Another Route</button>
+      </div>
+
+</div>
+  </div>
+</div>
+</div>			
+
+
+			</div>
+          <div class="tab-pane" id="d">
+<!-- 	          <h3>Round Table Discussion</h3> -->
+	          <p class="last">Join four industry experts with over 50 years of combined experience as they discuss the important issues surrounding eLog implementation. Click the play button below to watch the round table discussion.</p>
+	          <div class="video-container"><iframe width="853" height="480" src="https://www.youtube.com/embed/eVcwFkFhcjo" frameborder="0" allowfullscreen></iframe></div></div>
+          <div class="tab-pane" id="e">
+	          <h3>See How John Christner Trucking Can Help - Call 866-782-5407 today!</h3>
+	          <div class="video-container"><iframe width="853" height="480" src="https://www.youtube.com/embed/e-CRFxJti5s" frameborder="0" allowfullscreen></iframe></div>
+	          <br /><br />
+	          <p>eLog implementation is here—it’s a reality and it’s not going to disappear. Now is the critical time to ensure you have the information and resources needed to successfully transition to eLogs with minimal productivity loss.</p>
+
+<p>John Christner Trucking is a trusted name in the industry when it comes to eLog implementation. With over 30 years of trucking experience—five of which have been as a fully-eLog compliant trucking firm—John Christner Trucking understands the unique challenges of eLog implementation. From device installation to operations optimization, John Christner Trucking has the direct experience and first-hand knowledge you need to successfully transition to eLogs.</p>
+
+<p class="last">We encourage you to reach out to us to discover how we can further share this knowledge with you and help your company succeed. We look forward to connecting with you!</p>
+
+
+<style type="text/css" scoped>
+    .mauticform_wrapper {}
+    .mauticform-innerform {}
+    .mauticform-post-success {}
+    .mauticform-name { font-weight: bold; font-size: 1.5em; margin-bottom: 3px; }
+    .mauticform-description { margin-top: 2px; margin-bottom: 10px; }
+    .mauticform-error { margin-bottom: 10px; color: red; }
+    .mauticform-message { margin-bottom: 10px;color: green; }
+    .mauticform-row { display: block; margin-bottom: 20px; }
+    .mauticform-label { font-size: 1.1em; display: block; font-weight: bold; margin-bottom: 5px; }
+    .mauticform-row.mauticform-required .mauticform-label:after { color: #e32; content: " *"; display: inline; }
+    .mauticform-helpmessage { display: block; font-size: 0.9em; margin-bottom: 3px; }
+    .mauticform-errormsg { display: block; color: red; margin-top: 2px; }
+    .mauticform-selectbox, .mauticform-input, .mauticform-textarea { width: 50%; padding: 0.2em 0.2em; border: 1px solid #CCC; box-shadow: 0px 1px 3px #DDD inset; border-radius: 4px; box-sizing: border-box; }
+    .mauticform-checkboxgrp-row {}
+    .mauticform-checkboxgrp-label { font-weight: normal; }
+    .mauticform-checkboxgrp-checkbox {}
+    .mauticform-radiogrp-row {}
+    .mauticform-radiogrp-label { font-weight: normal; }
+    .mauticform-radiogrp-radio {}
+</style>
+<div id="mauticform_wrapper_elogbutton" class="mauticform_wrapper">
+    <form autocomplete="false" role="form" method="post" action="http://marketing.freeformagency.com/johnchristner/form/submit?formId=3" id="mauticform_elogbutton" data-mautic-form="elogbutton">
+        <div class="mauticform-error" id="mauticform_elogbutton_error"></div>
+        <div class="mauticform-message" id="mauticform_elogbutton_message"></div>
+        <div class="mauticform-innerform">
+
+            <div id="mauticform_elogbutton_submit"  class="mauticform-row mauticform-button-wrapper">
+                <button type="submit" name="mauticform[submit]" id="mauticform_input_elogbutton_submit" name="mauticform[submit]" value="" class="mauticform-button" value="1" style="margin-right: 1em; border: none;">Click here to start the JCT Process!</button> or call <strong>866-782-5407</strong> today.
+            </div>
+
+            <input type="hidden" name="mauticform[formId]" id="mauticform_elogbutton_id" value="3" />
+            <input type="hidden" name="mauticform[return]" id="mauticform_elogbutton_return" value="" />
+            <input type="hidden" name="mauticform[formName]" id="mauticform_elogbutton_name" value="elogbutton" />
+
+        </div>
+    </form>
+</div>
+
+
+<!-- 			<a class="blue-btn left-side-btn" style="margin-right: 1em;" href="#">Click here to start the JCT Process!</a> or call <strong>866-782-5407</strong> today. -->
+			
+			</div>
+          <div class="tab-pane" id="f">
+	          <h3>News Articles</h3>
+	          <p>However, despite the changes and challenges posed by the ELD mandate, successful implementation <i>is achievable</i> and can positively impact long-term trucking operations. John Christner trucking has been eLog compliant since 2012—a process that required a full spectrum of challenges and productivity losses before fully reaping the benefits of being an eLog-compliant carrier.</p>
+
+<p>According to John Christner Trucking’s COO Danny Christner, “It’s taken us a while, but through significant investments in software, training, and cultural refinement, our production and service are comparable to what they were with paper logs. It’s been a constant learning process, but our efforts have set us up for success well in advance of the December deadline and beyond.”</p> 
+
+<p class="last">You can read the full story on John Christner Trucking’s eLog implementation by clicking the link below.</p>
+			
+			<a class="blue-btn" target="_blank" href="JCT_Press_Release.pdf">DOWNLOAD PRESS RELEASE (PDF)</a>
+
+			
+			</div>
+        </div><!-- /tab-content -->
+      </div><!-- /tabbable -->
+    </div><!-- /col -->
+  </div><!-- /row -->
+</div><!-- /container -->
+	    </section>
+        <footer>
+	    <div class="inner">
+	        <div class="footer-div">
+		        <div class="contact-info">
+		        <h2 class="footer-menu-title">John Christner Trucking</h2><h1 class="footer-menu-line"></h1>			
+		        <p><a href="http://johnchristnertrucking.com/media/">JCT Media Center</a></p>
+<p>
+<a href="https://www.facebook.com/johnchristnertrucking?fref=ts&amp;ref=br_tf"><i class="fa fa-facebook-square"></i></a>
+<a href="https://twitter.com/drivejct?lang=en"><i class="fa fa-twitter-square"></i></a>
+</p>
+</div>
+
+
+<div class="contact-info">
+<p>
+Toll Free: 866-782-5407<br>
+Fax: 918-227-6685<br>
+</p>
+</div>
+<div class="contact-info">
+<p>
+<a href="http://maps.google.com/?q=19007%20W.%20Hwy%2033%20Sapulpa,%20OK%2074067" target="_blank">
+Address:<br />
+19007 W. Hwy 33<br>
+Sapulpa, OK 74067-1900
+</a>
+</p>
+</div>
+</div>
+		</aside></div>
+	    </div>
+	    </footer>
+        
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script> -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+        
+        <script src="js/plugins.js"></script>
+        <script src="js/main.js"></script>
+        
+        		<script type="text/javascript">
+			var clock;
+
+			$(document).ready(function() {
+
+				// Grab the current date
+				var currentDate = new Date();
+
+				// Set some date in the past. In this case, it's always been since Jan 1
+				var dueDate  = new Date("Decmeber 18, 2017 00:00:00");
+
+				// Calculate the difference in seconds between the future and current date
+				var diff = dueDate.getTime() / 1000 - currentDate.getTime() / 1000 ;
+
+				// Instantiate a coutdown FlipClock
+				clock = $('#flipClock').FlipClock(diff, {
+					clockFace: 'DailyCounter',
+					countdown: true
+				});
+			});
+		</script>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='https://www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+        </script>
+    </body>
+</html>
